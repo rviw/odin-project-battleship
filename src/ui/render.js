@@ -1,12 +1,19 @@
 const BOARD_SIZE = 10;
 
-const createCell = ({ x, y, className = "" } = {}) => {
+const createCell = ({ x, y, className = "", interactive = true } = {}) => {
   const cell = document.createElement("button");
   cell.type = "button";
   cell.className = `cell${className ? ` ${className}` : ""}`;
   cell.dataset.x = String(x);
   cell.dataset.y = String(y);
   cell.setAttribute("aria-label", `Cell ${x},${y}`);
+
+  if (!interactive) {
+    cell.disabled = true;
+    cell.tabIndex = -1;
+    cell.setAttribute("aria-disabled", "true");
+  }
+
   return cell;
 };
 
@@ -16,7 +23,11 @@ const classForState = (attackState) => {
   return "";
 };
 
-export const renderBoard = (container, board, { revealShips = false } = {}) => {
+export const renderBoard = (
+  container,
+  board,
+  { revealShips = false, interactive = false } = {},
+) => {
   container.replaceChildren();
 
   for (let y = 0; y < BOARD_SIZE; y += 1) {
@@ -34,10 +45,12 @@ export const renderBoard = (container, board, { revealShips = false } = {}) => {
         className = `${className} cell--ship`.trim();
       }
 
-      const cell = createCell({ x, y, className });
+      const cell = createCell({ x, y, className, interactive });
 
-      const isAttacked = attackState !== "unattacked";
-      cell.disabled = isAttacked;
+      if (interactive && attackState !== "unattacked") {
+        cell.disabled = true;
+        cell.setAttribute("aria-disabled", "true");
+      }
 
       container.append(cell);
     }

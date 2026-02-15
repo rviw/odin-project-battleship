@@ -31,12 +31,35 @@ const setStatus = (text) => {
 };
 
 const render = () => {
-  renderBoard(playerBoardEl, game.human.board, { revealShips: true });
-  renderBoard(computerBoardEl, game.computer.board, { revealShips: false });
+  renderBoard(playerBoardEl, game.human.board, {
+    revealShips: true,
+    interactive: false,
+  });
+  renderBoard(computerBoardEl, game.computer.board, {
+    revealShips: false,
+    interactive: !game.getState().isOver,
+  });
 };
 
-setStatus("Your turn: click a cell on the computer board.");
+const setStatusForTurn = (lastResult = null) => {
+  if (game.getState().isOver) {
+    setStatus(`Game over - ${game.getState().winner} wins!`);
+    return;
+  }
+
+  if (!lastResult) {
+    setStatus("Your turn: click a cell on the computer board.");
+    return;
+  }
+
+  setStatus(
+    `You attacked ${lastResult.human.coord.join(",")} (${lastResult.human.result}). ` +
+      `Computer attacked ${lastResult.computer.coord.join(",")} (${lastResult.computer.result}).`,
+  );
+};
+
 render();
+setStatusForTurn();
 
 bindEnemyBoardClicks(computerBoardEl, (coord) => {
   if (game.getState().isOver) return;
@@ -45,17 +68,8 @@ bindEnemyBoardClicks(computerBoardEl, (coord) => {
 
   try {
     const result = game.attack(coord);
-
-    if (game.getState().isOver) {
-      setStatus(`Game over - ${game.getState().winner} wins!`);
-    } else {
-      setStatus(
-        `You attacked ${result.human.coord.join(",")} (${result.human.result}). ` +
-          `Computer attacked ${result.computer.coord.join(",")} (${result.computer.result}).`,
-      );
-    }
-
     render();
+    setStatusForTurn(result);
   } catch (e) {
     setStatus(String(e.message || e));
   }
