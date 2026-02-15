@@ -49,7 +49,8 @@ export const createGameboard = () => {
     ships.push(ship);
 
     for (const coord of coords) {
-      occupied.set(keyOf(coord), ship);
+      const key = keyOf(coord);
+      occupied.set(key, ship);
     }
 
     return ship;
@@ -82,11 +83,27 @@ export const createGameboard = () => {
   const areAllShipsSunk = () =>
     ships.length > 0 && ships.every((ship) => ship.isSunk());
 
+  const hasShipAt = (coord) => {
+    if (!isValidCoord(coord)) throw new RangeError("Invalid coordinate");
+    return occupied.has(keyOf(coord));
+  };
+
+  const getAttackState = (coord) => {
+    if (!isValidCoord(coord)) throw new RangeError("Invalid coordinate");
+
+    const key = keyOf(coord);
+
+    if (!attacked.has(key)) return "unattacked";
+    return occupied.has(key) ? "hit" : "miss";
+  };
+
   return {
     placeShip,
     receiveAttack,
     getMissedShots,
     getHitShots,
     areAllShipsSunk,
+    hasShipAt,
+    getAttackState,
   };
 };
