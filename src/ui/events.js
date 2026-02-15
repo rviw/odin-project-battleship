@@ -10,3 +10,9 @@ export const bindEnemyBoardClicks = (container, onClickCell) => {
     onClickCell([x, y]);
   });
 };
+
+export const bindNewGameClick = (button, onClick) => {
+  button.addEventListener("click", () => {
+    onClick();
+  });
+};

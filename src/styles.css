@@ -8,6 +8,29 @@ body {
     sans-serif;
 }
 
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.new-game-btn {
+  border: 1px solid oklch(87.2% 0.01 258.338);
+  background: white;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.new-game-btn:hover,
+.new-game-btn:focus-visible {
+  background-color: oklch(97% 0.014 254.604);
+  outline: 2px solid oklch(70.7% 0.165 254.624);
+  outline-offset: -2px;
+}
+
 .status {
   margin: 1rem 0;
   padding: 1rem;
