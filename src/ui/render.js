@@ -35,6 +35,10 @@ export const renderBoard = (container, board, { revealShips = false } = {}) => {
       }
 
       const cell = createCell({ x, y, className });
+
+      const isAttacked = attackState !== "unattacked";
+      cell.disabled = isAttacked;
+
       container.append(cell);
     }
   }

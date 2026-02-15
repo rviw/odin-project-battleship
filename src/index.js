@@ -1,7 +1,7 @@
 import "./styles.css";
 
 import { createGameController } from "./game/createGameController.js";
-import { getEl, renderBoard } from "./ui/index.js";
+import { getEl, renderBoard, bindEnemyBoardClicks } from "./ui/index.js";
 
 const game = createGameController({
   placements: {
@@ -24,6 +24,39 @@ const game = createGameController({
 
 const playerBoardEl = getEl("#player-board");
 const computerBoardEl = getEl("#computer-board");
+const statusEl = getEl("#status");
 
-renderBoard(playerBoardEl, game.human.board, { revealShips: true });
-renderBoard(computerBoardEl, game.computer.board, { revealShips: false });
+const setStatus = (text) => {
+  statusEl.textContent = text;
+};
+
+const render = () => {
+  renderBoard(playerBoardEl, game.human.board, { revealShips: true });
+  renderBoard(computerBoardEl, game.computer.board, { revealShips: false });
+};
+
+setStatus("Your turn: click a cell on the computer board.");
+render();
+
+bindEnemyBoardClicks(computerBoardEl, (coord) => {
+  if (game.getState().isOver) return;
+
+  if (game.computer.board.getAttackState(coord) !== "unattacked") return;
+
+  try {
+    const result = game.attack(coord);
+
+    if (game.getState().isOver) {
+      setStatus(`Game over - ${game.getState().winner} wins!`);
+    } else {
+      setStatus(
+        `You attacked ${result.human.coord.join(",")} (${result.human.result}). ` +
+          `Computer attacked ${result.computer.coord.join(",")} (${result.computer.result}).`,
+      );
+    }
+
+    render();
+  } catch (e) {
+    setStatus(String(e.message || e));
+  }
+});
